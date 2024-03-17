@@ -1,4 +1,4 @@
-// Ex10.cpp/.ino
+// Adapted from Ex10.cpp/.ino
 //
 // OTA update from version.bin; run `python -m http.server 8000`
 // to serve, and store the current revision number in "version.txt"
@@ -9,31 +9,10 @@
 
 #include "PrAndUpThing.h"
 
-// what version of the firmware are we? (used to calculate need for updates)
-// see firmwareVersion in sketch.ino
-
-// IP address and port number: CHANGE THE IP ADDRESS!
-#define FIRMWARE_SERVER_IP_ADDR "10.0.0.49"
-#define FIRMWARE_SERVER_PORT    "8000"
-
 // setup ////////////////////////////////////////////////////////////////////
-void setup10() {
+void handleUpdate() {
   Serial.begin(115200); // initialise the serial line
-  getMAC(MAC_ADDRESS);  // store the MAC address as a chip identifier
-  dln(startupDBG, "\nsetup10..."); // debug printout
   Serial.printf("running firmware is at version %d\n", firmwareVersion);
-
-  // get on the network
-  WiFi.begin(); // register MAC first! and add SSID/PSK details if needed
-  uint16_t connectionTries = 0;
-  Serial.print("trying to connect to Wifi...");
-  while(WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    if(connectionTries++ % 75 == 0) Serial.println("");
-    delay(250);
-  }
-  delay(500); // let things settle for half a second
-  Serial.println("connected :)");
 
   // materials for doing an HTTPS GET on github from the BinFiles/ dir
   HTTPClient http;
@@ -77,23 +56,6 @@ void setup10() {
     return;
   }
 
-/*
-  // debug code, checks how much we can download of the bin file, then aborts
-  if(Update.begin(updateLength)) {
-    Serial.printf("starting OTA may take 2-5 mins to complete...\n");
-  }
-  WiFiClient s = http.getStream();
-  int bytesRead = 0;
-  while(s.available() > 0) {
-    if(s.read() == -1)
-      break;
-    bytesRead++;
-  }
-  Serial.printf("read %d bytes from stream\n", bytesRead);
-  Update.abort();
-  Serial.printf("OTA aborted\n");
-*/
-
   // write the new version of the firmware to flash
   WiFiClient stream = http.getStream();
   Update.onProgress(handleOTAProgress); // print out progress
@@ -119,16 +81,6 @@ void setup10() {
     Serial.flush();
   }
   stream.flush();
-}
-
-// loop /////////////////////////////////////////////////////////////////////
-void loop10() {
-  int sliceSize = 500000;
-  loopIteration++;
-  if(loopIteration % sliceSize == 0) // a slice every sliceSize iterations
-    dln(otaDBG, "OTA loop");
-
-  webServer.handleClient(); // serve pending web requests every loop, as Ex09
 }
 
 // helper for downloading from cloud firmware server; for experimental
@@ -162,9 +114,31 @@ void handleOTAProgress(size_t done, size_t total) {
       Serial.printf(">");
     else
       Serial.printf(" ");
+      progressBarLed(progress);
   }
   Serial.printf(
     "] %d %%%c", int(progress * 100.0), (progress == 1.0) ? '\n' : '\r'
   );
   // Serial.flush();
 }
+
+  void progressBarLed(float progress) {
+    float progressPercentage = progress * 100;
+    dln(startupDBG, "Progress: " + String(progressPercentage) + "%");
+    if (progressPercentage < 16.66) {
+      ledOn(0);
+    } else if (progressPercentage < 33.33) {
+      ledOn(1);
+    } else if (progressPercentage < 50) {
+      ledOn(2);
+    } else if (progressPercentage < 66.66) {
+      ledOn(3);
+    } else if (progressPercentage < 83.33) {
+      ledOn(4);
+    } else if (progressPercentage < 100) {
+      ledOn(5);
+    } else {
+        allLedOn();
+    }
+
+  }

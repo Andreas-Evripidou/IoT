@@ -4,25 +4,19 @@
 
 #include "PrAndUpThing.h"
 
-void setup09() { // initialisation
-  // in previous exercises I've chained all the setups, but now things are
-  // getting more complex I've amalgamated all the setup code so far here...
+char MAC_ADDRESS[13]; // MAC addresses are 12 chars, plus the NULL terminator
+String apSSID; // access point SSID
+WebServer webServer(80); // a simple web server
 
+void setupWifiPorvisioning() { // initialisation
   Serial.begin(115200); // initialise the serial line
   getMAC(MAC_ADDRESS);  // store the MAC address as a chip identifier
   pinMode(LED_BUILTIN, OUTPUT);       // set up GPIO pin for built-in LED
-
-  dln(startupDBG, "\nsetup09...");
-  blink(5);                           // blink the on-board LED to say "hi"
-
-  firstSliceMillis = millis();        // remember when we began
-  lastSliceMillis = firstSliceMillis; // an approximation to use in 1st loop
-
+  dln(startupDBG, "Starting AP");
   startAP();            // fire up the AP...
+  dln(startupDBG, "Initialising web server");
   initWebServer();      // ...and the web server
-  WiFi.begin();         // for when creds already stored by board; if none:
-  // WiFi.begin(SSID, PSK);
-  blink(5);             // blink the on-board LED to say "bye"
+  blinkAll(3, 300);        
 }
 
 const char *templatePage[] = {    // we'll use Ex07 templating to build pages
@@ -41,8 +35,33 @@ const char *templatePage[] = {    // we'll use Ex07 templating to build pages
   "</body></html>\n\n",                                                 // 11
 };
 
-void loop09() { // the workhorse
+void loopWifiProvisioning() { // the workhorse
   webServer.handleClient(); // serve pending web requests every loop
+}
+
+// start the Access Point
+void startAP() {
+  apSSID = String(AP_SSID);
+  apSSID.concat(MAC_ADDRESS);
+
+  if(! WiFi.mode(WIFI_AP_STA))
+    dln(startupDBG, "failed to set Wifi mode");
+  if(! WiFi.softAP(apSSID.c_str(), AP_PSK))
+    dln(startupDBG, "failed to start soft AP");
+  printIPs();
+}
+
+void printIPs() {
+  if(startupDBG) { // easier than the debug macros for multiple lines etc.
+    Serial.print("AP SSID: ");
+    Serial.print(apSSID);
+    Serial.print("; IP address(es): local=");
+    Serial.print(WiFi.localIP());
+    Serial.print("; AP=");
+    Serial.println(WiFi.softAPIP());
+  }
+  if(netDBG)
+    WiFi.printDiag(Serial);
 }
 
 void initWebServer() { // changed naming conventions to avoid clash with Ex06
@@ -59,6 +78,18 @@ void initWebServer() { // changed naming conventions to avoid clash with Ex06
 
   webServer.begin();
   dln(startupDBG, "HTTP server started");
+}
+
+void getHtml( // turn array of strings & set of replacements into a String
+  String& html, const char *boiler[], int boilerLen,
+  replacement_t repls[], int replsLen
+) {
+  for(int i = 0, j = 0; i < boilerLen; i++) {
+    if(j < replsLen && repls[j].position == i)
+      html.concat(repls[j++].replacement);
+    else
+      html.concat(boiler[i]);
+  }
 }
 
 // webserver handler callbacks
