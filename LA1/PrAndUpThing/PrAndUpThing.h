@@ -13,8 +13,8 @@ void initWifiConnection();
 void setupHelperFunctions();
 
 // Variables for wifi connection /////////////////////////////////////////////
-#define WIFI_SSID "502_Panorama" // change to your SSID
-#define WIFI_PSK "Kyz1sAndreas!"  // change to your password (if any)
+#define WIFI_SSID "wifi" // change to your SSID
+#define WIFI_PSK "password"  // change to your password (if any)
 
 // Variables for Access Point ////////////////////////////////////////////////
 #define AP_SSID "EVRIPIDOU-" // can be given any ssid
