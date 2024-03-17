@@ -9,8 +9,10 @@
 int firmwareVersion = 1;
 unsigned long pressTime;
 bool touching = false;
+#define SWITCH_PIN   8
 
 void setup() {
+    pinMode(SWITCH_PIN, INPUT_PULLUP);
     setupHelperFunctions();
     initWifiConnection();
     setupWifiPorvisioning();
@@ -19,9 +21,7 @@ void setup() {
 void loop() {
     unsigned long now = millis();
 
-    int tval = touchRead(T4);
-
-    if (tval > 100000) {
+    if (digitalRead(SWITCH_PIN) == LOW){
         if (!touching) {
             pressTime = now;
             touching = true;
@@ -48,8 +48,6 @@ void loop() {
         }
     
     } else {
-        allLedOn();
-        dln(startupDBG, "In Loop");
         allLedOff();
         blink(0, 1, 100);
         blink(5, 1, 100);

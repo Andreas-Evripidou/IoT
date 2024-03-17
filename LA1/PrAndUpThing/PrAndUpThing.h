@@ -13,15 +13,15 @@ void initWifiConnection();
 void setupHelperFunctions();
 
 // Variables for wifi connection /////////////////////////////////////////////
-#define WIFI_SSID "Evripidou" // change to your SSID
-#define WIFI_PSK "2hdy7qjHd73dk"  // change to your password (if any)
+#define WIFI_SSID "502_Panorama" // change to your SSID
+#define WIFI_PSK "Kyz1sAndreas!"  // change to your password (if any)
 
 // Variables for Access Point ////////////////////////////////////////////////
 #define AP_SSID "EVRIPIDOU-" // can be given any ssid
 #define AP_PSK "password" // can be given any password
 
 // variables for OTA update (server detatils) ////////////////////////////////
-#define FIRMWARE_SERVER_IP_ADDR "10.248.70.121" //change to your server IP
+#define FIRMWARE_SERVER_IP_ADDR "192.168.4.2" //change to your server IP
 #define FIRMWARE_SERVER_PORT    "8000" //change to your server port
 
 // MAC address ///////////////////////////////////////////////////////////////

@@ -10,7 +10,7 @@ void initWifiConnection() {
     // get on the network
     dln(startupDBG, "Connecting to Wifi");
     dln(startupDBG, "Wifi SSID: " + String(WIFI_SSID));
-    dln(startupDBG, "Wifi PSK: " + String(WIFI_PSK));
+    dln(startupDBG, "Wifi PSK: ");
     WiFi.begin(WIFI_SSID, WIFI_PSK);
     uint16_t connectionTries = 0;
     Serial.print("trying to connect to Wifi...");
