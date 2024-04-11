@@ -1,4 +1,16 @@
 
+**NOTE:**
+
+There appears to be no documentation in this submission, although there is
+code and images....
+
+Hamish
+
+
+
+
+
+
 # COM3505 Lab Assessment 1
 
 Put your documentation here. 
