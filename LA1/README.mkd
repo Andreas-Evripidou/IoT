@@ -1,20 +1,88 @@
 
-**NOTE:**
-
-There appears to be no documentation in this submission, although there is
-code and images....
-
-Hamish
-
-
-
-
-
-
 # COM3505 Lab Assessment 1
+This project constructs a device utilizing LEDs to visually represent the stages involved in provisioning and updating an ESP32-S3 board. Instead of a touch sensor, a push button on pin A5 is utilized because my board's touch sensors were dysfunctional. A video demonstration of the device in operation is accessible [here](https://www.youtube.com/watch?v=VZunf4qKtB4) (Sorry the video is more than 1 minute, my home router sometimes refuses a connection).
 
-Put your documentation here. 
+## Guide to Build the Device
 
-Put your code in [PrAndUpThing/PrAndUpThing.ino](PrAndUpThing/PrAndUpThing.ino).
+The following components are required to assemble the device:
 
-See [the rubric](rubric.mkd) for more details.
+- ESP32 feather board (with pre-soldered stacking headers)
+- Breadboard
+- 9-way ribbon cables
+- push button
+- 2 x 3mm red LEDs
+- 2 x 3mm yellow LEDs
+- 2 x 3mm green LEDs
+- 6 x 120Ω resistors
+- USB C cable
+
+**STEP 1:** Place the breadboard ensuring the letters on top and bottom face towards you (not upside down).
+
+**STEP 2:** Insert the ESP32 microcontroller with the USB C port facing towards you. Ensure the two pin columns are positioned on columns i and c, with the topmost pin of both sides at rows 1 and 5 and the lowermost pins of the left and right sides at row 16.
+
+<img src="../LA1/PrAndUpThing/pictures/front.jpg" width="250">
+
+
+**STEP 3:** Attach the LED lights on column e of the breadboard from row 19 to row 30 in the sequence: 2 green, 2 yellow, 2 red. Place the anode of the LEDs (the longer lead) on odd row numbers and the cathode (the shorter lead) on even row numbers (with the cathode closer to you).
+
+<img src="../LA1/PrAndUpThing/pictures/leds.jpg" width="250">
+
+**STEP 4:** Add the 120Ω resistors on column a of the breadboard. One end should align with the cathodes of the LEDs (even-numbered rows), while the other end should connect to the negative column of the breadboard (ground connection) on the right side.
+
+<img src="../LA1/PrAndUpThing/pictures/side1.jpg" width="250">
+
+
+**STEP 5:** Insert ribbon cables on the breadboard. For LED control, place one end of the cable at column j on the same row as the anodes (odd-numbered rows) and the other end at column j or directly on the ESP32 board. Refer to the provided table for cable insertion positions.
+
+| Port (on ESP32) | Port row (on Breadboard) | Breadboard row (on column a)|
+| --------------- | ------------------------ | --------------------------- |
+| 5               | 14                       | 30                           |
+| 6               | 13                       | 28                           |
+| 9               | 12                       | 26                           |
+|10               | 11                       | 24                           |
+|11               | 10                       | 22                           |
+|12               | 9                        | 20                          |
+
+**STEP 6:** Add a ribbon cable for the push button (touch sensor alternative). Insert it on Port A5 of the ESP32 and connect it on one side of the push button. Connect the GND Port of the ESP32 to the ground row using another ribbon cable. Finaly connect the ground row to the other side of the push button.
+
+<img src="../LA1/PrAndUpThing/pictures/back.jpg" width="250">
+<img src="../LA1/PrAndUpThing/pictures/Ground_and_Button.jpg" width="250">
+
+**STEP 7:** Connect the USB C cable to the ESP32 board and to a USB port on your computer to complete the assembly. The final board should look like:
+
+<img src="../LA1/PrAndUpThing/pictures/above.jpg" width="250">
+<img src="../LA1/PrAndUpThing/pictures/side2.jpg" width="250">
+
+## Guide to Use the Device
+
+**STEP 1:** Clone or download the repository on your machine.
+
+**STEP 2:** Open the project in your preferred IDE (e.g., Visual Studio Code with PlatformIO, Arduino IDE).
+
+**STEP 3:** Modify the configurations in the file [PrAndUpThing/PrAndUpThing.h](PrAndUpThing/PrAndUpThing.h) to match your network settings and server details.
+- `WIFI_PSK` should be changed to the password of your wifi network (if any)
+- `FIRMWARE_SERVER_IP_ADDR` should be changed to the IP address of your machine (which will act as a server for the OTA updates)
+- `FIRMWARE_SERVER_PORT` should be changed to the port number your server is running on (default is 8000)
+
+**STEP 4 (optional):** Customize the Access Point name and password in the same file if desired.
+- `AP_SSID` should be changed to the name of the Access Point you want to create
+- `AP_PSK` should be changed to the password of the Access Point you want to create
+
+**STEP 5:** Start a server on you machine by opening a terminal window and running the following command (make sure you are in the [PrAndUpThing/updates](PrAndUpThing/updates/) directory were the firmware files are stored):
+
+```
+python -m http.server 8000
+```
+
+**STEP 6:** Connect the ESP32 device to your computer and upload/flash the code. Put the board into bootloader mode before flashing by holding boot and pressing (and releasing) reset.
+
+**STEP 7:** After flashing, press the reset button on the ESP32 board to start the program. 
+
+## Functionality Overview
+Upon activation, the device connects to the WiFi network. During connection attempts, a single red LED blinks. Once connected, provisioning initializes, and upon readiness, all LEDs blink three times. The device then creates an Access Point. Users can connect to this Access Point to configure the device via a web browser. Alternatively, users connected to the same WiFi network as the ESP32 can access the device directly.
+
+During provisioning, the first (red) and last (green) LEDs blink alternatively. Upon receiving a web request, all LEDs blink rapidly twice.
+
+To initiate the update mode, press the push button (touch sensor alternative) for 3 seconds. The LEDs indicate the time elapsed by turning on one by one from red to green. If the firmware is up to date, all LEDs blink three times. Otherwise, the device updates the firmware, with LEDs acting as a progress bar. Upon completion, the device indicates success with an LED blinking sequence and restarts.
+
+Note: To simulate a firmware update, ensure a server is running on the root of the [PrAndUpThing/updates](PrAndUpThing/updates) directory, and update the version number in [PrAndUpThing/updates/version.txt](PrAndUpThing/updates/version.txt) to a higher number than the current version.

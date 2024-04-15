@@ -6,13 +6,14 @@
 
 // to blink or not to blink...
 bool doBlinking = true;
+extern char MAC_ADDRESS[];
 
 void setup() {
   Serial.begin(115200);
   Serial.println("arduino started");
   Serial.println("MAC address:");
-  macAddres = getEfuseMac()
-  Serial.println(macAddres);
+  MAC_ADDRESS = getEfuseMac()
+  Serial.println(MAC_ADDRESS);
   pinMode(LED_BUILTIN, OUTPUT);
 } // setup
 
