@@ -8,7 +8,20 @@ My records state that you're not in a pair.
 We've reviewed your COM3505 assessment 1 from
 https://gitlab.com/eandreas1/com3505-student-2024
 
-Unfortunately it did not meet the minimum standard for the assessment so you
-have failed this (threshold) element of the course :(
+Congratulations, you've passed!
 
-Please get in touch to discuss. Thanks, Hamish
+As you know, we don't provide marks for this part of the course
+assessment, but if we _were_ doing so, we would estimate your work to
+be somewhere in the 3rd quartile.
+
+That's good work.
+
+Some feedback: You've put together a comprehensive IoT project that aligns
+well with the assignment rubric, especially in illustrating the provisioning
+and over-the-air update functions using an ESP32 board. The use of LEDs
+to indicate different stages of those functions is a smart choice, effectively
+providing visual feedback which is crucial for understanding the state of the
+device. Your documentation is reasonably thorough and well-structured, making it easy
+to follow the setup and usage of the device. The substitution of a push button
+for the touch sensor functionality due to hardware issues is a reasonable
+adjustment and is well documented.
