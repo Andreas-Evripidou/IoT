@@ -13,7 +13,8 @@
 #include <lvgl.h>                       // LVGL //////////////////////////////
 #include <vector>
 #include "WiFi.h"
-#include <HTTPClient.h>
+
+#include <geolocation.h>
 
 #define CONFIG_IDF_TARGET_ESP32S3 1
 #include <TFT_eSPI.h>
@@ -34,8 +35,6 @@ static void text_input_event_cb(lv_event_t *e);
 static lv_obj_t *panicButton = NULL;
 static lv_obj_t *panicLabel = NULL;
 static lv_obj_t *bodyLabel = NULL;
-
-HTTPClient http;
 
 typedef enum {
   NONE,
@@ -299,15 +298,19 @@ static void buildStatusBar() {
   lv_style_set_bg_opa(&style_btn, LV_OPA_50);
 
   lv_obj_t *statusBar = lv_obj_create(lv_scr_act());
-  lv_obj_set_size(statusBar, tft.width() - 20, 70);
+  lv_obj_set_size(statusBar, tft.width() - 20, 68);
   lv_obj_align(statusBar, LV_ALIGN_TOP_MID, 0, 0);
 
   // lv_obj_remove_style(statusBar, NULL, LV_PART_SCROLLBAR | LV_STATE_ANY);
+  // create a container for the time label
+  lv_obj_t *timeLabelContainer = lv_obj_create(statusBar);
+  lv_obj_set_size(timeLabelContainer, tft.width() - 60, 32);
+  lv_obj_align(timeLabelContainer, LV_ALIGN_LEFT_MID, 0, 0);
+  
+  timeLabel = lv_label_create(timeLabelContainer);
+  // lv_obj_set_size(timeLabel, tft.width() - 60, 30);
 
-  timeLabel = lv_label_create(statusBar);
-  lv_obj_set_size(timeLabel, tft.width() - 50, 30);
-
-  lv_label_set_text(timeLabel, "WiFi Not Connected!    " LV_SYMBOL_CLOSE);
+  lv_label_set_text(timeLabel, "WiFi Not Connected! " LV_SYMBOL_CLOSE);
   lv_obj_align(timeLabel, LV_ALIGN_LEFT_MID, 0, 0);
 
   settingBtn = lv_btn_create(statusBar);
@@ -464,23 +467,14 @@ void panicButtonEventCallback(lv_event_t *e) {
 
     if (code == LV_EVENT_CLICKED) {
         // Make the API call when the panic button is clicked
-        http.begin("http://google.com"); // Specify your API endpoint
-        int httpResponseCode = http.GET(); // Change to the appropriate HTTP method
-        if (httpResponseCode > 0) {
-            // Request was successful, handle the response here if needed
-            // print
-            Serial.println("whooooo");
-        } else {
-            // Request failed, handle the error here if needed
-        }
-        http.end(); // Close the connection
+        getGeoLocation();
     }
 }
 
 static void buildBody() {
   lv_obj_t *bodyScreen = lv_obj_create(lv_scr_act());
   lv_obj_add_style(bodyScreen, &border_style, 0);
-  lv_obj_set_size(bodyScreen, tft.width() - 20, tft.height() - 60);
+  lv_obj_set_size(bodyScreen, tft.width() - 20, tft.height() - 65);
   lv_obj_align(bodyScreen, LV_ALIGN_BOTTOM_MID, 0, 0);
 
   bodyLabel = lv_label_create(bodyScreen);
