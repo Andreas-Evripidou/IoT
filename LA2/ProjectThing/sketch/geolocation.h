@@ -1,7 +1,7 @@
 
 #include <Arduino.h>
 #include <WiFi.h>
-#include <WifiLocation.h>
+#include <wifiLocation/WifiLocation.h>
 
 #if __has_include("wificonfig.h")
 #include "wificonfig.h"
