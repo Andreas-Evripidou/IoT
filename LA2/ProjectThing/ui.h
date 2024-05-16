@@ -3,16 +3,25 @@
 #include <lvgl.h>
 #include <geolocation.h>
 #include <TFT_eSPI.h>
+#include <HTTPClient.h> // ESP32 library for making HTTP requests
 
 static lv_style_t border_style;
 static lv_style_t popupBox_style;
 static lv_obj_t *timeLabel;
 static lv_obj_t *settings;
 static lv_obj_t *settingBtn;
+static lv_obj_t *otaBtn;
 static lv_obj_t *settingCloseBtn;
 static lv_obj_t *settingWiFiSwitch;
 static lv_obj_t *wfList;
 static lv_obj_t *settinglabel;
+static lv_obj_t *otaBox;
+static lv_obj_t *otaLabel;
+static lv_obj_t *otaCheckUpdateBtn;
+static lv_obj_t *otaCloseBtn;
+static lv_obj_t *btnSymbol;
+static lv_obj_t *btnLabel;
+static lv_obj_t *otaProgress;
 static lv_obj_t *mboxConnect;
 static lv_obj_t *mboxTitle;
 static lv_obj_t *mboxPassword;
@@ -35,6 +44,7 @@ static const uint16_t screenWidth  = 480;
 static const uint16_t screenHeight = 320;
 
 TFT_eSPI tft = TFT_eSPI(screenHeight, screenWidth); // the LCD screen
+HTTPClient http; // the HTTP client
 
 void showPanicButton() {
   lv_obj_clear_flag(panicButton, LV_OBJ_FLAG_HIDDEN);
@@ -123,7 +133,7 @@ static void buildStatusBar() {
   lv_label_set_text(label, LV_SYMBOL_SETTINGS);  /*Set the labels text*/
   lv_obj_center(label);
 
-  lv_obj_t *otaBtn = lv_btn_create(statusBar);
+  otaBtn = lv_btn_create(statusBar);
   lv_obj_set_size(otaBtn, 30, 30);
   lv_obj_align(otaBtn, LV_ALIGN_RIGHT_MID, -40, 0);
   lv_obj_add_event_cb(otaBtn, btn_event_cb, LV_EVENT_ALL, NULL);
@@ -139,7 +149,31 @@ void panicButtonEventCallback(lv_event_t *e) {
 
     if (code == LV_EVENT_CLICKED) {
         // Make the API call when the panic button is clicked
-        getGeoLocation();
+        lv_label_set_text(panicLabel, "Getting Location...");
+        lv_refr_now(NULL);
+
+        int wlResult = getGeoLocation();
+
+        if (wlResult == WL_OK) {
+            // Send the SOS message
+            lv_label_set_text(panicLabel, "Sending SOS...");
+            lv_refr_now(NULL);
+            
+            // Send the SOS message to the server
+            http.begin("http://" FIRMWARE_SERVER_IP_ADDR ":" FIRMWARE_SERVER_PORT "/sos");
+            http.addHeader("Content-Type", "application/json");
+            String payload = "{\"lat\": " + String(loc.lat, 7) + ", \"lon\": " + String(loc.lon, 7) + "}";
+            int httpCode = http.POST(payload);
+            http.end();
+            
+            popupMsgBox("Success", "SOS Sent!");
+        } else {
+            // Show the error message
+            popupMsgBox("Error", "Could not get location");
+        }
+
+        lv_label_set_text(panicLabel, "Panic!");
+    
     }
 }
 
@@ -203,8 +237,6 @@ static void buildBody() {
 
   lv_obj_add_event_cb(panicButton, panicButtonEventCallback, LV_EVENT_CLICKED, NULL);
 
-  
-
   hidePanicButton();
 }
 
@@ -236,6 +268,43 @@ static void buildSettings() {
   lv_obj_align_to(wfList, settinglabel, LV_ALIGN_TOP_LEFT, 0, 30);
 }
 
+static void buildOTA() {
+  otaBox = lv_obj_create(lv_scr_act());
+  lv_obj_add_style(otaBox, &border_style, 0);
+  lv_obj_set_size(otaBox, tft.width() - 100, tft.height() - 40);
+  lv_obj_align(otaBox, LV_ALIGN_TOP_RIGHT, -20, 20);
+
+  otaLabel =  lv_label_create(otaBox);
+  lv_label_set_text(otaLabel, "No Internet" LV_SYMBOL_DOWNLOAD);
+  lv_obj_align(otaLabel, LV_ALIGN_TOP_LEFT, 0, 0);
+  
+
+  otaCloseBtn = lv_btn_create(otaBox);
+  lv_obj_set_size(otaCloseBtn, 30, 30);
+  lv_obj_align(otaCloseBtn, LV_ALIGN_TOP_RIGHT, 0, 0);
+  lv_obj_add_event_cb(otaCloseBtn, btn_event_cb, LV_EVENT_ALL, NULL);
+  btnSymbol = lv_label_create(otaCloseBtn);
+  lv_label_set_text(btnSymbol, LV_SYMBOL_CLOSE);
+  lv_obj_center(btnSymbol);
+
+  otaCheckUpdateBtn = lv_btn_create(otaBox);
+  lv_obj_set_size(otaCheckUpdateBtn, 150, 50);
+  lv_obj_align(otaCheckUpdateBtn, LV_ALIGN_CENTER, 0, 0);
+  lv_obj_add_event_cb(otaCheckUpdateBtn, btn_event_cb, LV_EVENT_ALL, NULL);
+
+  btnLabel = lv_label_create(otaCheckUpdateBtn);
+  lv_label_set_text(btnLabel, "Check For Update");
+  lv_obj_center(btnLabel);
+
+  otaProgress = lv_bar_create(otaBox);
+  lv_obj_set_size(otaProgress, 200, 20);
+  lv_obj_align(otaProgress, LV_ALIGN_CENTER, 0, 0);
+  lv_bar_set_value(otaProgress, 0, LV_ANIM_ON);
+
+  lv_obj_add_flag(otaBox, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_add_flag(otaProgress, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_add_flag(otaCheckUpdateBtn, LV_OBJ_FLAG_HIDDEN);
+}
 
 static void text_input_event_cb(lv_event_t *e) {
   lv_event_code_t code = lv_event_get_code(e);
@@ -266,5 +335,6 @@ static void initUI() {
   buildPWMsgBox();
   buildBody();
   buildSettings();
+  buildOTA();
 
 }
