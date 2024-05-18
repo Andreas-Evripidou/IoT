@@ -1,8 +1,214 @@
 
 # COM3505 Lab Assessment 2
 
-Put your documentation here. 
+## Introduction
+Welcome to the documentation for the Panic IoT Device! This document provides essential information on how to set up, configure, and use the device effectively. Please read this file carefully before proceeding with the device.
 
-Put your code in [ProjectThing/ProjectThing.ino](ProjectThing/ProjectThing.ino).
+## Table of Contents
+- [1. Getting Started](#1-getting-started)
+- [2. List of Features](#2-list-of-features)
+- [3. Hardware](#3-hardware)
+- [4. Design](#4-design)
+  - [Hardware Design](#hardware-design)
+  - [User Interface Design](#user-interface-design)
+  - [Rationale for the Task](#rationale-for-the-task)
+  - [Implementation Plan](#implementation-plan)
+  - [Testing Plan](#testing-plan)
+- [5. Software Configuration](#5-software-configuration)
+    - [Setting up the program](#setting-up-the-program)
+- [6. Usage](#6-usage)
+- [7. Self Assessment](#7-self-assessment)
+  - [What Went Well](#what-went-well)
+  - [Challenges and Improvements](#challenges-and-improvements)
+- [8. Future Enhancements](#8-future-enhancements)
+- [9. Conclusion](#9-conclusion)
 
-See [the rubric](rubric.mkd) for more details.
+## 1. Getting Started
+
+The Panic IoT Device is an emergency device designed to call for help in case of an emergency. The program is developed to be uploaded to an [UnPhone](https://unphone.net) device, which contains an ESP-32 microprocessor. The program provides users with a panic button that, when pressed, sends an SOS message to a remote server. Once the button is pressed, a list of nearby WiFi access points is gathered and sent to the [Google Geolocation API](https://developers.google.com/maps/documentation/geolocation/overview), which calculates the latitude and longitude of the UnPhone device. The program also allows users to connect to WiFi networks through the Graphical User Interface in order to make the API call to the Google Geolocation API. Additionally, the program supports Over-the-Air (OTA) updates for firmware.
+
+
+For a live demo please watch the [video on youtube](https://youtu.be/16U9hK-clnQ).<br>
+The video is uploaded on Youtube as unlisted so it can only be accessed through the link provided.
+
+## 2. List of Features
+
+### Wifi Provisioning
+- Easily connect to WiFi networks through the Graphica User Interface.
+
+### Panic Button
+- When pressed it calculates the loncation of the user and then sends an sos message to a remote server.
+
+### OTA Updates
+- Supports Over-the-Air (OTA) updates for firmware
+
+## 3. Hardware
+
+<p align="left" width="100%">
+    <img src="images/unphone_front.jpg" width="33%">
+    <img src="images/unphone_side.jpg" width="33%">
+    <img src="images/unphone_back.jpg" width="33%">
+</p>
+
+1. Button 1 (Not used in this project)
+2. Button 2 (Not used in this project)
+3. Button 3 (Not used in this project)
+4. On/off switch
+5. Reboot button
+6. USB-C port, also charging port
+
+## 4. Design
+### Hardware Design
+
+The Panic IoT Device is designed around the UnPhone, which features an ESP-32 microprocessor. The hardware components include:
+
+- UnPhone Device: A microcontroller development platform based on the ESP-32 chip, offering various peripherals and connectivity options.
+- WiFi Module: Integrated within the ESP-32, enabling connections to nearby WiFi networks for data transmission and OTA updates.
+- Display: Utilised to show the Graphical User Interface, allowing users to interact with the device, press the panic button, manage WiFi connections, and update the firmware.
+
+### User Interface Design
+
+The user interface is built using the LVGL (Light and Versatile Graphics Library) TFT library. The UI includes the following elements:
+
+- WiFi Provisioning Screen: Displays available WiFi networks and allows the user to select and connect to a network.
+- Panic Button Screen: Shows the status of the panic button and any ongoing SOS operations.
+- OTA Update Screen: Provides information about available firmware updates and the progress of any ongoing updates.
+
+### Rationale for the Task
+
+The chosen task—developing a panic button IoT device—demonstrates several key capabilities of IoT devices:
+
+1. Connectivity: Utilises WiFi to connect to networks, send data to servers, and receive updates.
+2. Geolocation: Leverages WiFi signals and the Google Geolocation API to determine the device's location, showcasing integration with cloud services.
+3. User Interaction: Provides a user-friendly interface for managing connections and updates, demonstrating the use of embedded displays and interfaces.
+4. Remote Management: Supports OTA updates, illustrating the capability for remote device management and maintenance.
+
+### Implementation Plan
+
+#### 1. Hardware Setup:
+- Assemble the UnPhone device and connect the panic button.
+- Ensure the display and WiFi module are functional.
+
+#### 2. Software Development:
+- Develop the WiFi Provisioning Module to manage connections.
+- Implement the Panic Button Module to detect presses and initiate the SOS sequence.
+- Integrate the Geolocation Module to interact with the Google Geolocation API.
+- Develop the OTA Update Module for remote firmware updates.
+- Design the user interface using LVGL TFT.
+
+#### 3. Integration and Testing:
+- Integrate all modules and ensure seamless interaction.
+- Perform unit tests on individual modules to validate functionality.
+- Conduct system tests to ensure end-to-end operation.
+- Test the user interface for usability and responsiveness.
+- Perform real-world tests to validate geolocation accuracy and SOS message delivery.
+
+### 4. Testing Plan
+
+#### 1. Unit Testing:
+- Test WiFi connection management independently.
+- Validate panic button press detection and SOS sequence initiation.
+- Test geolocation functionality using simulated WiFi data.
+- Validate OTA updates by performing mock updates.
+
+#### 2. Integration Testing:
+- Ensure all modules work together without conflicts.
+- Test the entire SOS sequence, from button press to message delivery.
+
+#### 3. System Testing:
+- Test the device in various environments to validate WiFi provisioning and geolocation.
+- Conduct stress tests to ensure the device handles repeated use reliably.
+- Test the user interface for responsiveness and ease of use.
+
+## External Tools and Libraries Used
+
+- **LVGL TFT**: Used for creating graphical user interfaces. [LVGL GitHub](https://github.com/lvgl/lvgl)
+- **WifiLocation Library**: Used for geolocation functionality. [WiFiLocation GitHub](https://github.com/gmag11/WifiLocation/)
+
+
+## 5. Software Configuration
+The Panic IoT program can be installed by cloning the repository from GitLab. Here, you will find instructions on how to configure the device after cloning the repository. It covers topics such as connecting to a network, setting up Wi-Fi and the required connection between the two devices for multi device game mode.
+
+### Setting up the program
+Before uploading the program to the UnPhone device, a few steps must be followed to ensure the program works correctly. The steps are as follows:
+
+1. Open the program in an IDE of your choice (Visual Studio Code with PlatformIO was used, but Adruino IDE should also work).
+2. Write down the MAC addresses of both devices that will be used to play the game.
+3. In the [`config.h`](ProjectThing/config.h) file, find the three constants called [`_IRMWARE_SERVER_IP_ADDR`](ProjectThing/config.h#L2), [`FIRMWARE_SERVER_PORT`](ProjectThing/config.h#L3), and [`googleApiKey`](ProjectThing/config.h#L6). The first constant should hold the ip address of the server handling the Over The Air (OTA) udpates, and the reciever of the sos message. The second constant should hold the port of the server. The third constant holds the api key of the google geolocation api, for instruction of how to obtain one visit [this page](https://developers.google.com/maps/documentation/geolocation/get-api-key). Replace the values of the constants with the IP address and port number number of your server.
+4. Run the python flask server that is located in the [`server`](server) folder. The server is used to handle the OTA udpates and the sos messages. The server should be run on the same network as the devices that will be used to send the sos signal. The server should be run with the following command:
+```bash
+cd server
+python3 server.py
+```
+5. Built and upload the program to the device.
+6. The devices with the program uploaded can be turned on and used to send panic signals.
+
+
+## 6. Usage
+
+As soon as an UnPhone device is turned on ([`switch 4`](#2-hardware)) with the program built and uploaded, the main menu screen is shown where the user can navigate through the various functionalities provided by the Panic IoT Device.  The main menu screen is shown below:
+
+<p align="center" width="100%">
+    <img src="images/initial_screen.jpg" height="250">
+</p>
+
+The main menu provides access to all the functionalities of the Panic IoT Device. Users can navigate to WiFi Provisioning to connect the device to available WiFi networks by selecting the desired network and entering the required password.
+
+<!-- Grid of wifi provisioning 6 photos -->
+<p align="center" width="100%">
+    <img src="images/wifi_provisioning_1.jpg" height="250">
+    <img src="images/wifi_provisioning_2.jpg" height="250">
+    <img src="images/wifi_provisioning_3.jpg" height="250">
+    <img src="images/wifi_provisioning_4.jpg" height="250">
+    <img src="images/wifi_provisioning_5.jpg" height="250">
+</p>
+
+
+The Panic Button option allows users to send an SOS signal;
+
+<p align="center" width="100%">
+    <img src="images/panic_1.jpg" height="250">
+    <img src="images/panic_2.jpg" height="250">
+</p>
+pressing the button gathers nearby WiFi access point data and sends it to the Google Geolocation API, which calculates the device's latitude and longitude and sends this information to a remote server.
+
+<p align="center" width="100%">
+    <img src="images/panic_3.jpg" height="250">
+    <img src="images/panic_4.jpg" height="250">
+</p>
+
+The OTA Updates option lets users check for and install firmware updates over WiFi, ensuring the device remains up-to-date. 
+
+<p align="center" width="100%">
+    <img src="images/ota_1.jpg" height="250">
+    <img src="images/ota_2.jpg" height="250">
+    <img src="images/ota_3.jpg" height="250">
+    <img src="images/ota_4.jpg" height="250">
+    <img src="images/ota_5.jpg" height="250">
+</p>
+
+The main menu also features status indicators for WiFi connection, and the current time.
+
+
+## 7. Self Assessment
+### What Went Well
+
+1. Successful Integration: The integration of various components (WiFi, geolocation, OTA updates) worked seamlessly.
+2. User Interface: The GUI for WiFi provisioning and status updates was intuitive and responsive.
+
+### Challenges and Improvements
+
+1. WiFi Connectivity: Initial difficulties with WiFi connectivity in areas with weak signals were resolved by improving the antenna and retry mechanisms.
+2. Power Consumption: The device's power consumption was higher than expected. Future iterations could benefit from power optimization techniques.
+3. Environmental Testing: More extensive testing in diverse environmental conditions (e.g., extreme temperatures) is needed to ensure reliability.
+
+## 8. Future Enhancements
+
+- Battery Life: Improve battery life through hardware and software optimisations.
+- Advanced Geolocation: Integrate additional geolocation methods (e.g., GPS) for improved accuracy.
+- Enhanced Durability: Design a more rugged enclosure to withstand harsh conditions and repeated use.
+- Additional Sensors: Add sensors (e.g., accelerometer, temperature) to provide more contextual information during an emergency.
+
+
+## 9. Conclusion
+We hope this documentation has provided you with a comprehensive understanding of the Panic IoT Device. This project aimed to aid people in emergencie, enabling users to fast request help with the unPhone device. By following the installation, configuration, and usage instructions outlined in this README, you'll be ready to call for help in case of emergency with a button press.
