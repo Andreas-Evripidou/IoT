@@ -3,4 +3,4 @@
 #define FIRMWARE_SERVER_PORT    "8000" //change to your server port
 
 // variable for google maps API key /////////////////////////////////////////
-const char* googleApiKey = "AIzaSyCkKB1ZNCww_khUmnrer17wnP6w4en4rtc";
+const char* googleApiKey = ""; // add your api key

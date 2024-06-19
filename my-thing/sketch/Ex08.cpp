@@ -5,11 +5,11 @@
 
 // globals and utilities for connecting to COM3505 cloud server
 WiFiClientSecure com3505Client; // the TLS web client
-const char *com3505Addr   = "54.78.124.75"; // server IP (see blackboard)
-const int   com3505Port   = 9194;                // server port
-const char* wifiSsid      = "502_Panorama";         // wifi AP for ESP to connect
-const char* wifiPassword  = "Kyz1sAndreas!";     // wifi PSK
-const char* myEmail       = "eandreas1@sheffield.ac.uk";// yr email
+const char *com3505Addr   = "1.1.1.1"; // server IP (see blackboard)
+const int   com3505Port   = 8000;                // server port
+const char* wifiSsid      = "wifi_ssid";         // wifi AP for ESP to connect
+const char* wifiPassword  = "password";     // wifi PSK
+const char* myEmail       = "";// yr email
 
 // x509 certificate for the server
 const char* cert = \
